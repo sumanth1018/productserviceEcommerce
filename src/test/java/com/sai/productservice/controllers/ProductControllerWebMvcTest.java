@@ -3,8 +3,11 @@ package com.sai.productservice.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sai.productservice.dtos.GenericProductDto;
+import com.sai.productservice.services.FakeStoreProductService;
 import com.sai.productservice.services.ProductService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -16,15 +19,17 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.ArrayList;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.is;
-
+import static org.mockito.ArgumentMatchers.*;
 
 @WebMvcTest(ProductController.class)
 // It will only initialize the contollers, services, repositories that are going to link to the apis, it doesn't initialize any unnecessary bean.
@@ -40,6 +45,18 @@ public class ProductControllerWebMvcTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private ProductController productController;
+
+    @Captor
+    private ArgumentCaptor<Long> idCaptor;
+
+    @Captor
+    private ArgumentCaptor<Long> fakeStoreCaptor;
+    @Autowired
+    private FakeStoreProductService fakeStoreProductService;
+
 
     @Test
     void getAllProductsReturnsEmptyListWhenNoProducts() throws Exception {
@@ -92,7 +109,29 @@ public class ProductControllerWebMvcTest {
                             .content(objectMapper.writeValueAsString(productToCreate))
             ).andExpect(
                     content().string(objectMapper.writeValueAsString(expectedProduct))
-        ).andExpect(status().is(200));
+        ).andExpect(status().is(200))
+                .andExpect(jsonPath("$.student.name", is("sai")))
+                .andExpect(jsonPath("$.length()", is(2)));
               //  .andExpect((ResultMatcher) jsonPath("$", matches("1001")));
+    }
+
+    @Test
+    void productControllerCallsProductServiceWithSameProductId() throws Exception {
+        Long id  = 101L;
+        when(productService.getProductById(any()))
+                .thenReturn(new GenericProductDto());
+
+
+        // check that the product service is being called with the exact same
+        // parameters as controller
+
+
+        productController.getProductById(id);
+
+        verify(productService).getProductById(idCaptor.capture());
+        // idCaptor.capture() = Ensures that same id is passed.
+
+        assertEquals(id, idCaptor.getValue());
+
     }
 }

@@ -7,6 +7,8 @@ import com.sai.productservice.services.ProductService;
 import com.sai.productservice.thirdpartyclients.productservice.fakestore.FakeStoreProductServiceClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,22 +17,33 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class ProductControllerTest {
 
     @Autowired
+    @MockitoBean
     private FakeStoreProductServiceClient  fakeStoreProductServiceClient;
 
     @Autowired
     private ProductController productController;
 
+   // @MockitoBean
+    //private ProductService productService;
+
     @MockitoBean
-    private ProductService productService;
+    private FakeStoreProductService productService;
 
     @MockitoBean
     private FakeStoreProductService fakeStoreProductService;
+
+    @Captor
+    private ArgumentCaptor<Long> idCaptor;
+
+    @Captor
+    private ArgumentCaptor<Long> fakeStoreCaptor;
 
     @Test
     void returnsNullWhenProductDoesNotExist() throws NotFoundException{
@@ -111,6 +124,32 @@ public class ProductControllerTest {
 
         assertTrue(1 + 1 == 2, "Not corrt");
 
+    }
+
+    @Test
+    void productControllerCallsProductServiceWithSameProductId() throws Exception {
+        Long id  = 1L;
+
+        when(productService.getProductById(any()))
+                .thenCallRealMethod();
+
+        when(fakeStoreProductServiceClient.getProductById(any()))
+                .thenCallRealMethod();
+//        when(productService.getProductById(any()))
+//                .thenReturn(new GenericProductDto());
+
+
+        // check that the product service is being called with the exact same
+        // parameters as controller
+
+
+        productController.getProductById(id);
+
+        verify(productService).getProductById(idCaptor.capture());
+        // idCaptor.capture() = Ensures that same id is passed.
+        verify(fakeStoreProductServiceClient).getProductById(fakeStoreCaptor.capture());
+        assertEquals(id, idCaptor.getValue());
+        assertEquals(id, fakeStoreCaptor.getValue());
     }
 
 }
