@@ -1,7 +1,9 @@
 package com.sai.productservice.services;
 
 import com.sai.productservice.dtos.GenericProductDto;
+import com.sai.productservice.models.Product;
 import com.sai.productservice.repositories.ProductRepository;
+import com.sai.productservice.security.JwtObject;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -16,8 +18,15 @@ public class SelfProductServiceImpl implements  ProductService {
 
 
     @Override
-    public GenericProductDto getProductById(Long id) {
-
+    public GenericProductDto getProductById(Long id, Long UserIdTryingToAccess) {
+//        Product product = productRepository.getProductById(id);
+//        if  (product.getStatus().equals(PRIVATE)) {
+//            if (UserIdTryingToAccess.equals(product.getCreatorId())) {
+//                return product;
+//            }
+//            return null
+//        }
+//        return product
         return new GenericProductDto();
     }
 

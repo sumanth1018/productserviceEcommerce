@@ -12,7 +12,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+//import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,7 +62,7 @@ public class ProductControllerTest {
                 productService.getProductById(any(Long.class))
         ).thenReturn(genericProductDto);
 
-        assertEquals(genericProductDto, productController.getProductById(123L));
+        assertEquals(genericProductDto, productController.getProductById("abcd",123L));
     }
 
 
@@ -71,7 +71,7 @@ public class ProductControllerTest {
         when(
                 productService.getProductById(any(Long.class))
         ).thenReturn(null);
-        assertThrows(NotFoundException.class, () -> productController.getProductById(123L));
+        assertThrows(NotFoundException.class, () -> productController.getProductById("abcd",123L));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class ProductControllerTest {
                 new GenericProductDto()
         );
 
-        GenericProductDto genericProductDto1 = productController.getProductById(1L);
+        GenericProductDto genericProductDto1 = productController.getProductById("abcd",1L);
         assertEquals(genericProductDto.getTitle(), "sai");
     }
 
@@ -143,7 +143,7 @@ public class ProductControllerTest {
         // parameters as controller
 
 
-        productController.getProductById(id);
+        productController.getProductById("abcd",id);
 
         verify(productService).getProductById(idCaptor.capture());
         // idCaptor.capture() = Ensures that same id is passed.

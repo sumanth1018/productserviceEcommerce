@@ -2,6 +2,7 @@ package com.sai.productservice.services;
 
 import com.sai.productservice.dtos.GenericProductDto;
 import com.sai.productservice.exceptions.NotFoundException;
+import com.sai.productservice.security.JwtObject;
 import com.sai.productservice.thirdpartyclients.productservice.fakestore.FakeStoreProductDto;
 import com.sai.productservice.thirdpartyclients.productservice.fakestore.FakeStoreProductServiceClient;
 import org.springframework.context.annotation.Primary;
@@ -35,7 +36,7 @@ public class FakeStoreProductService implements ProductService {
 
 
 
-    public GenericProductDto getProductById(Long id) throws NotFoundException {
+    public GenericProductDto getProductById(Long id, Long UserIdTryingToAccess) throws NotFoundException {
         return ConvertFakeStoreProductIntoGenericProduct(fakeStoreProductServiceClient.getProductById(id));
     }
 
